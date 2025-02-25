@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Çapraz Hesaplama</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(145deg, #1a1a1a, #2d2d2d);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: #fff;
+            margin: 0;
+        }
+
+        h2 {
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            background: linear-gradient(45deg, #00b4d8, #0077b6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 700;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 2.5rem;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 500px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.8rem;
+            font-weight: 500;
+            color: #e0e0e0;
+            font-size: 0.95rem;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            font-size: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        input[type="number"]:focus {
+            border-color: #00b4d8;
+            outline: none;
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 0 3px rgba(0, 180, 216, 0.2);
+        }
+
+        input[type="number"]::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        button {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(45deg, #00b4d8, #0077b6);
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin-top: 1rem;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 180, 216, 0.3);
+        }
+
+        .result {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            border-radius: 12px;
+            font-size: 1rem;
+            line-height: 1.6;
+            transition: all 0.3s ease;
+        }
+
+        .result.profit {
+            background: rgba(76, 175, 80, 0.15);
+            border: 1px solid rgba(76, 175, 80, 0.3);
+            box-shadow: 0 4px 20px rgba(76, 175, 80, 0.1);
+        }
+
+        .result.loss {
+            background: rgba(244, 67, 54, 0.15);
+            border: 1px solid rgba(244, 67, 54, 0.3);
+            box-shadow: 0 4px 20px rgba(244, 67, 54, 0.1);
+        }
+
+        .result b {
+            font-weight: 600;
+        }
+
+        .profit-text {
+            color: #6cff7a !important;
+        }
+
+        .loss-text {
+            color: #ff6b6b !important;
+        }
+
+        .error {
+            color: #ff6b6b;
+            background: rgba(255, 107, 107, 0.1);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            border: 1px solid rgba(255, 107, 107, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>⚖️ Çapraz Hesaplama</h2>
+        <label for="oran1">Birinci Oran:</label>
+        <input type="number" id="oran1" placeholder="Örn: 1.85">
+        
+        <label for="oran2">İkinci Oran:</label>
+        <input type="number" id="oran2" placeholder="Örn: 2.10">
+        
+        <label for="miktar1">Birinci Orana Oynanan Miktar:</label>
+        <input type="number" id="miktar1" placeholder="TL cinsinden">
+        
+        <button onclick="hesapla()">Hesapla →</button>
+        
+        <div class="result" id="sonuclar"></div>
+    </div>
+
+    <script>
+        function hesapla() {
+            const oran1 = parseFloat(document.getElementById("oran1").value);
+            const oran2 = parseFloat(document.getElementById("oran2").value);
+            const miktar1 = parseFloat(document.getElementById("miktar1").value);
+            
+            if (oran1 <= 0 || oran2 <= 0 || miktar1 <= 0 || isNaN(oran1) || isNaN(oran2) || isNaN(miktar1)) {
+                document.getElementById("sonuclar").innerHTML = `
+                    <p class="error">⚠️ Lütfen tüm alanlara geçerli pozitif değerler girin!</p>
+                `;
+                document.getElementById("sonuclar").className = "result";
+                return;
+            }
+            
+            const miktar2 = (oran1 * miktar1) / oran2;
+            const toplamGereken = miktar1 + miktar2;
+            const toplamKazanc = oran1 * miktar1;
+            const kar = toplamKazanc - toplamGereken;
+
+            const isProfit = kar >= 0;
+            const themeClass = isProfit ? "profit" : "loss";
+            const textClass = isProfit ? "profit-text" : "loss-text";
+            const emoji = isProfit ? "📈" : "📉";
+            const karDurumu = isProfit ? "Kâr" : "Zarar";
+            
+            document.getElementById("sonuclar").className = `result ${themeClass}`;
+            document.getElementById("sonuclar").innerHTML = `
+                <p>Toplam yatırım: <b>${toplamGereken.toFixed(2)} TL</b></p>
+                <p>İkinci orana yatırılacak: <b>${miktar2.toFixed(2)} TL</b></p>
+                <p>Potansiyel kazanç: <b>${toplamKazanc.toFixed(2)} TL</b></p>
+                <p class="${textClass}">${emoji} ${karDurumu}: ${Math.abs(kar).toFixed(2)} TL</p>
+            `;
+        }
+    </script>
+</body>
+</html>
